@@ -7,10 +7,10 @@ import {
 } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
 import Home from "./pages/Home";
-import AuthLayout from "./layout/AuthLayout";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Categories from "./pages/Categories";
+import AllPodcasts from "./pages/AllPodcasts";
 import Profile from "./pages/Profile";
 import store from "./store";
 import AddPodcast from "./pages/AddPodcast";
@@ -18,6 +18,8 @@ import { useEffect } from "react";
 import axios from "axios";
 import { authActions } from "./store/auth";
 import ErrorPage from "./pages/ErrorPage"; // Import the ErrorPage component
+import CategoriesPage from "./pages/CategoriesPage";
+import DescriptionPage from "./pages/DescriptionPage";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -53,17 +55,22 @@ const App = () => {
 
             {/* Add the AddPodcast route under MainLayout */}
             <Route path="/add-podcast" element={<AddPodcast />} />
+            <Route path="/all-podcasts" element={<AllPodcasts />} />
+            <Route
+              path="/categories/:categoryName"
+              element={<CategoriesPage />}
+            />
+            <Route path="/description/:id" element={<DescriptionPage />} />
 
             {/* Profile Route (protected) */}
             <Route
               path="/profile"
-              element={isLoggedIn ? <Profile /> : <Navigate to="/login" />}
+              element={isLoggedIn ? <Profile /> : <Navigate to="/" />}
             />
           </Route>
 
           {/* Auth Routes */}
-          <Route path="/" element={<AuthLayout />}>
-            {/* If logged in, prevent access to login/signup */}
+          <Route path="/">
             <Route
               path="/signup"
               element={isLoggedIn ? <ErrorPage /> : <Signup />}

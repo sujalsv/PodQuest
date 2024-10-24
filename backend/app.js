@@ -9,8 +9,8 @@ require("dotenv").config();
 require("./connection/connection.js");
 
 const corsOptions = {
-  origin: "http://localhost:5173", 
-  credentials: true, 
+  origin: "http://localhost:5173",
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
@@ -20,6 +20,9 @@ app.use(express.json());
 
 // Middleware to parse cookies
 app.use(cookieParser()); // Move this above the routes
+app.use("/uploads", express.static("uploads"));
+
+
 
 // All routes
 app.use("/api/v1", userApi);

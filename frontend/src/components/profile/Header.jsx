@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux"; // Import useSelector
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { logoutSuccess } from "../../store/auth"; // Change this line
+import { authActions } from "../../store/auth"; // Change this line
 
 const Header = () => {
   const [userData, setUserData] = useState({ username: "", email: "" });
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Get isLoggedIn state from the Redux store
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   useEffect(() => {
     // Fetch user details function
@@ -31,15 +34,19 @@ const Header = () => {
   const logoutHandler = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/v1/logout",
+        "http://localhost:3000/api/v1/log-out",
         {},
         {
           withCredentials: true,
         }
       );
       console.log("Logout success:", res.data);
-      dispatch(logoutSuccess()); // Dispatch the logoutSuccess action
-      navigate("/login"); // Redirect to the login page
+      dispatch(authActions.logoutSuccess());
+
+      // Log the current authentication state
+      console.log("Current isLoggedIn state after logout:", isLoggedIn); // This should now reflect the updated state
+
+      navigate("/"); // Change this to the desired route after logout
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -52,7 +59,7 @@ const Header = () => {
           <div className="flex flex-col items-start">
             <h1 className="text-3xl font-bold mb-1 font-serif">Profile</h1>
             <div className="text-lg font-semibold mb-1">
-              Hello, {userData.username} !
+              Hello, {userData.username}!
             </div>
             <div className="text-md font-medium mb-4">{userData.email}</div>
           </div>

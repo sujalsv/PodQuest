@@ -15,17 +15,12 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      unique: true,
     },
-    // Reference to User model
-    user: {
-      type: mongoose.Types.ObjectId,
-      ref: "User", // Use "User" instead of "user"
-    },
+    // Reference to the Podcast model
     podcasts: [
       {
         type: mongoose.Types.ObjectId,
-        ref: "podcasts", // Ensure this reference is correct
+        ref: "Podcast", // Correct the reference to the Podcast model
       },
     ],
   },

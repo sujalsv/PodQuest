@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
 
 const InputPodcast = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   console.log(isLoggedIn);
+
   // State for the front image and dragging
   const [frontImage, setFrontImage] = useState(null);
   const [dragging, setDragging] = useState(false);
@@ -70,7 +72,17 @@ const InputPodcast = () => {
 
   // Handle podcast submission
   const handleSubmitPodcast = async () => {
-    // Create a new FormData object
+    if (
+      !Inputs.title ||
+      !Inputs.description ||
+      !Inputs.category ||
+      !frontImage ||
+      !audioFile
+    ) {
+      toast.error("Please fill in all fields and upload the required files.");
+      return;
+    }
+
     const data = new FormData();
     console.log(Inputs, frontImage, audioFile);
     data.append("title", Inputs.title);
@@ -78,8 +90,8 @@ const InputPodcast = () => {
     data.append("category", Inputs.category);
     data.append("frontImage", frontImage);
     data.append("audioFile", audioFile);
+
     try {
-      // Send POST request
       const res = await axios.post(
         "http://localhost:3000/api/v1/add-podcast",
         data,
@@ -87,18 +99,27 @@ const InputPodcast = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-          withCredentials: true, // This allows credentials like cookies to be sent
+          withCredentials: true, // Allow credentials like cookies
         }
       );
-
-      console.log(res); // Log success message
+      toast.success(res.data.message);
     } catch (error) {
-      console.log("error adding podcast", error.data); // Log error
+      toast.error(
+        "Error adding podcast: " +
+          (error.response ? error.response.data : error.message)
+      );
+    } finally {
+      setInputs({ title: "", description: "", category: "" });
+      setFrontImage(null);
+      setAudioFile(null);
     }
   };
 
   return (
     <div className="max-w-3xl mx-auto py-12">
+      {/* Toast Container for notifications */}
+      <ToastContainer />
+
       {/* Heading */}
       <h1 className="text-3xl font-bold text-gray-800 mb-6">
         Create Your Podcast
@@ -161,8 +182,8 @@ const InputPodcast = () => {
               id="title"
               name="title"
               placeholder="Title for your podcast"
-              value={Inputs.title} // Use value from inputs state
-              onChange={handleChangeInputs} // Handle change
+              value={Inputs.title}
+              onChange={handleChangeInputs}
               className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -180,8 +201,8 @@ const InputPodcast = () => {
               name="description"
               placeholder="Description for your podcast"
               rows="4"
-              value={Inputs.description} // Use value from inputs state
-              onChange={handleChangeInputs} // Handle change
+              value={Inputs.description}
+              onChange={handleChangeInputs}
               className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -199,7 +220,7 @@ const InputPodcast = () => {
               accept=".mp3, .wav, .m4a, .ogg"
               id="audiofile"
               className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={handleAudioFile} // Handle audio file change
+              onChange={handleAudioFile}
             />
           </div>
 
@@ -214,8 +235,8 @@ const InputPodcast = () => {
             <select
               name="category"
               id="category"
-              value={Inputs.category} // Use value from inputs state
-              onChange={handleChangeInputs} // Handle change
+              value={Inputs.category}
+              onChange={handleChangeInputs}
               className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="" disabled>
@@ -238,7 +259,7 @@ const InputPodcast = () => {
           <div>
             <button
               className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onClick={handleSubmitPodcast} // Submit podcast
+              onClick={handleSubmitPodcast}
             >
               Create Podcast
             </button>

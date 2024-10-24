@@ -5,9 +5,12 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const { uploadFields } = require("../middleware/multer");
 
-const Podcast = require("../models/Podcast"); // Import the Podcast model
+const Podcast = require("../models/podcast"); // Import the Podcast model
 const Category = require("../models/category"); // Import the Category model
 const User = require("../models/user"); // Import the User model for user-related operations
+
+console.log(Category);
+console.log(Podcast);
 
 router.post("/add-podcast", authMiddleware, uploadFields, async (req, res) => {
   console.log("Received a request to add a podcast");
@@ -23,15 +26,22 @@ router.post("/add-podcast", authMiddleware, uploadFields, async (req, res) => {
     if (!title || !description || !frontImage || !audioFile) {
       return res.status(400).json({ message: "All fields are required." });
     }
+    if (!category) {
+      return res.status(400).json({ message: "Category is required" });
+    }
 
     const user = req.user; // This should be set by your auth middleware
-    const cat = await Category.findOne({ categoryName: category });
 
-    if (!cat) {
+    const normalizedCategory = category.toLowerCase();
+
+    const foundCategory = await Cat.findOne({
+      categoryName: normalizedCategory,
+    });
+    if (!foundCategory) {
       return res.status(404).json({ message: "Category not found" });
     }
 
-    const catid = cat._id;
+    const catid = foundCategory._id;
     const userid = user._id; // Ensure this is defined correctly
 
     // Create a new podcast
@@ -69,10 +79,13 @@ router.get("/get-podcasts", async (req, res) => {
   try {
     const podcasts = await Podcast.find({})
       .populate("category")
-      .sort({ createdAt: -1 }); // Sort by createdAt in descending order
+      .sort({ createdAt: -1 });
+
+    console.log("Retrieved podcasts:", podcasts); // Log the podcasts retrieved
 
     return res.status(200).json(podcasts);
   } catch (error) {
+    console.error("Error occurred while retrieving podcasts:", error); // Log the error
     return res.status(500).json({ message: "Server error", error });
   }
 });
@@ -80,7 +93,7 @@ router.get("/get-podcasts", async (req, res) => {
 // Route to get podcasts for a specific user with authentication
 router.get("/get-user-podcasts", authMiddleware, async (req, res) => {
   try {
-    const userId = req.user._id; // Extract user ID from the authenticated user
+    const userId = req.user._id; // Keep the same 'user' field as in /add-podcast
 
     const data = await User.findById(userId)
       .populate("podcasts") // Populate podcasts associated with the user
@@ -99,14 +112,14 @@ router.get("/get-user-podcasts", authMiddleware, async (req, res) => {
 });
 
 // Route to get a podcast by ID
-router.get("/get-podcast-by-id/:id", async (req, res) => {
+router.get("/get-podcast/:id", async (req, res) => {
   try {
     const podcastId = req.params.id;
 
     const podcast = await Podcast.findById(podcastId).populate(
       "category",
       "categoryName"
-    ); // Populate category name
+    ); // Consistent use of 'category' and 'categoryName'
 
     return res.status(200).json(podcast);
   } catch (error) {
@@ -119,10 +132,14 @@ router.get("/category/:cat", async (req, res) => {
   try {
     const { cat } = req.params; // Get category from request parameters
 
-    // Find category by name and populate the podcasts
-    const category = await Category.find({ categoryName: cat }).populate({
+    const normalizedCategory = cat.toLowerCase(); // Normalize to lowercase (same as in /add-podcast)
+
+    // Find category by normalized name and populate the podcasts
+    const category = await Category.find({
+      categoryName: normalizedCategory,
+    }).populate({
       path: "podcasts",
-      populate: { path: "category" },
+      populate: { path: "category" }, // Consistent use of 'category'
     });
 
     // Aggregate all podcasts from the category
@@ -131,7 +148,7 @@ router.get("/category/:cat", async (req, res) => {
       podcasts = [...podcasts, ...category.podcasts];
     });
 
-    return res.status(200).json({ data: podcasts }); // Return podcasts
+    return res.status(200).json({ data: podcasts });
   } catch (error) {
     return res.status(500).json({ message: "Server error", error });
   }

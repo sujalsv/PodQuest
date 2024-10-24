@@ -21,9 +21,9 @@ const Login = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  console.log("before login, isloggedin=", isLoggedIn);
+  // console.log("before login, isloggedin=", isLoggedIn);
   const handleSubmit = async (e) => {
-    console.log("after login, isloggedin=", isLoggedIn);
+    // console.log("after login, isloggedin=", isLoggedIn);
     e.preventDefault(); // Prevent form submission
     try {
       const response = await axios.post(
