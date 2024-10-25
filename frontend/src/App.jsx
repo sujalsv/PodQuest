@@ -17,13 +17,13 @@ import AddPodcast from "./pages/AddPodcast";
 import { useEffect } from "react";
 import axios from "axios";
 import { authActions } from "./store/auth";
-import ErrorPage from "./pages/ErrorPage"; // Import the ErrorPage component
+import ErrorPage from "./pages/ErrorPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import DescriptionPage from "./pages/DescriptionPage";
 
 const App = () => {
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn); // Access Redux state to check if logged in
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   useEffect(() => {
     const fetch = async () => {
@@ -52,8 +52,6 @@ const App = () => {
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Home />} />
             <Route path="/categories" element={<Categories />} />
-
-            {/* Add the AddPodcast route under MainLayout */}
             <Route path="/add-podcast" element={<AddPodcast />} />
             <Route path="/all-podcasts" element={<AllPodcasts />} />
             <Route
@@ -61,14 +59,11 @@ const App = () => {
               element={<CategoriesPage />}
             />
             <Route path="/description/:id" element={<DescriptionPage />} />
-
-            {/* Profile Route (protected) */}
             <Route
               path="/profile"
               element={isLoggedIn ? <Profile /> : <Navigate to="/" />}
             />
           </Route>
-
           {/* Auth Routes */}
           <Route path="/">
             <Route

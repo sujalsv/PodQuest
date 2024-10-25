@@ -3,27 +3,29 @@ const User = require("../models/user");
 
 const authMiddleware = async (req, res, next) => {
   const token = req.cookies.podcasterUserToken; // Ensure this matches your cookie name
+  console.log("Token received:", token); // Log the token
+
+  // Return unauthorized if no token is present
+  if (!token) {
+    return res.status(401).json({ message: "Access denied, token missing!" });
+  }
+
   try {
-    // Retrieve token from cookies instead of headers
-    console.log("Token received:", token); // Log the token
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded token:", decoded); // Log decoded token
 
-    if (token) {
-      // Verify the token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log("Decoded token:", decoded); // Log decoded token
+    // Fetch user based on the decoded token's id
+    const user = await User.findById(decoded.id).select("-password");
+    console.log("User found:", user); // Log the user object
 
-      // Fetch user based on the decoded token's id
-      const user = await User.findById(decoded.id).select("-password");
-      console.log("User found:", user); // Log the user object
-
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Attach user to the request object
-      req.user = user;
-      next(); // Proceed to the next middleware or route handler
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    // Attach user to the request object
+    req.user = user;
+    next(); // Proceed to the next middleware or route handler
   } catch (error) {
     console.error("Error in auth middleware:", error);
 

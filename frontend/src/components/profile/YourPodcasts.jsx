@@ -8,20 +8,22 @@ const YourPodcasts = () => {
 
   useEffect(() => {
     const fetchPodcasts = async () => {
-      const res = await axios.get(
-        "http://localhost:3000/api/v1/get-user-podcasts",
-        { withCredentials: true }
-      );
-      setPodcasts(res.data);
-      console.log("API Response:", res.data); // Log the API response
+      try {
+        const res = await axios.get(
+          "http://localhost:3000/api/v1/get-user-podcasts",
+          { withCredentials: true }
+        );
+        setPodcasts(res.data);
+        console.log("API Response:", res.data); // Log the API response
+      } catch (error) {
+        console.error("Error fetching podcasts:", error); // Handle potential errors
+      }
     };
     fetchPodcasts();
   }, []);
 
   return (
     <div className="w-full mx-auto p-6 bg-gray-100 text-gray-800">
-      {" "}
-      {/* Changed max-w-4xl to w-full */}
       <header className="flex justify-between items-center py-4">
         <h1 className="text-3xl font-bold text-gray-900">Your Podcasts</h1>
 
@@ -41,7 +43,13 @@ const YourPodcasts = () => {
           ))
         ) : (
           <div className="col-span-full text-center text-lg text-gray-600">
-            Loading podcasts...
+            <p className="mb-2">
+              It looks like you haven't added any podcasts yet.
+            </p>
+            <p className="mb-2">
+              Start creating your podcast collection by clicking the button
+              above!
+            </p>
           </div>
         )}
       </div>

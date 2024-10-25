@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom"; // Ensure this is imported
 
 const Home = () => {
   return (
@@ -18,9 +19,11 @@ const Home = () => {
         <p className="text-md md:text-lg mb-4">
           "Discover great stories and insights that make you smile!"
         </p>
-        <button className="bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-6 rounded text-lg">
-          Start Exploring Podcasts
-        </button>
+        <Link to="/all-podcasts">
+          <button className="bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-6 rounded text-lg">
+            Start Exploring Podcasts
+          </button>
+        </Link>
       </div>
     </div>
   );

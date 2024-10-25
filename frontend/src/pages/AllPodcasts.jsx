@@ -7,8 +7,14 @@ const AllPodcasts = () => {
 
   useEffect(() => {
     const fetchPodcasts = async () => {
-      const res = await axios.get("http://localhost:3000/api/v1/get-podcasts");
-      setPodcasts(res.data);
+      try {
+        const res = await axios.get(
+          "http://localhost:3000/api/v1/get-podcasts"
+        );
+        setPodcasts(res.data);
+      } catch (error) {
+        console.error("Error fetching podcasts:", error); // Handle potential errors
+      }
     };
     fetchPodcasts();
   }, []);
@@ -27,7 +33,10 @@ const AllPodcasts = () => {
           ))
         ) : (
           <div className="col-span-full text-center text-lg text-gray-600">
-            Loading podcasts...
+            <p className="mb-2">No podcasts have been added yet.</p>
+            <p className="mb-2">
+              Be the first to share your thoughts and experiences!
+            </p>
           </div>
         )}
       </div>

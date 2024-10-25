@@ -9,6 +9,7 @@ const PodcastCard = ({ items }) => {
   const imageUrl = `http://localhost:3000/${frontImage}`;
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
   const handlePlay = (e) => {
     if (isLoggedIn) {
       e.preventDefault();
@@ -21,12 +22,13 @@ const PodcastCard = ({ items }) => {
       );
     }
   };
-  // Ensure items and frontImage are defined
+
+  // Uniform category background color
+  const categoryBackgroundColor = "bg-gray-300"; // Choose a uniform background color
+  const categoryFont = "font-bold"; // Use a bolder font for the category
 
   return (
-    <div className="border border-gray-300 rounded-lg overflow-hidden shadow-md m-4 transition-transform duration-200 hover:scale-105 w-64">
-      {" "}
-      {/* Fixed width added */}
+    <div className="border-2 border-gray-800 rounded-lg overflow-hidden shadow-md m-4 transition-transform duration-200 hover:scale-105 w-64 bg-gray-100">
       <Link
         to={`/description/${items?._id}`}
         className="block text-gray-800 no-underline"
@@ -48,15 +50,17 @@ const PodcastCard = ({ items }) => {
           <div className="text-gray-600 text-md mb-2 text-center">
             {items?.description?.slice(0, 50)}...
           </div>
-          {/* Podcast Category */}
-          <div className="text-gray-500 text-sm mb-2 text-center">
-            {items?.category?.categoryName || "No Category"}
+          {/* Podcast Category with Shadow and Margin */}
+          <div
+            className={`border border-gray-600 rounded-full px-4 py-1 text-center text-gray-600 ${categoryBackgroundColor} ${categoryFont} mb-2`}
+          >
+            {items?.category?.categoryName}
           </div>
-          {/* Play Button */}
+          {/* Play Button with Margin */}
           <div className="flex justify-center mb-2">
             <Link
               to={isLoggedIn ? "#" : "/Signup"}
-              className="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-500 transition-colors duration-200"
+              className="bg-slate-900 text-white rounded px-4 py-2 transition-colors duration-200 hover:bg-gray-600"
               onClick={handlePlay}
             >
               Play
